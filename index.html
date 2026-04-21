@@ -12,72 +12,39 @@
             --bg-dark: #0f001f;
         }
 
-        /* --- TELA DE CARREGAMENTO ULTRA --- */
+        /* --- ANIMAÇÃO DE FUNDO DINÂMICO --- */
+        #bg-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; background: radial-gradient(circle at 50% 50%, #1a0033 0%, #0f001f 100%);
+        }
+
+        /* --- TELA DE CARREGAMENTO --- */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #1a0033 0%, #05000a 100%); 
-            z-index: 9999; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
+            background: var(--bg-dark); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease;
         }
-
-        /* Animação de Glitch no Título */
-        .loader-logo { 
-            font-size: 42px; font-weight: 900; color: white; 
-            text-shadow: 2px 2px var(--secondary-neon), -2px -2px var(--primary-neon);
-            margin-bottom: 30px; letter-spacing: 4px; z-index: 2;
-            animation: logoPulse 2s infinite ease-in-out;
-        }
-
-        @keyframes logoPulse {
-            0%, 100% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.05); filter: brightness(1.3); text-shadow: 4px 4px var(--secondary-neon), -4px -4px var(--primary-neon); }
-        }
-
-        .loader-container { width: 250px; text-align: center; z-index: 2; }
-        .loader-bar { 
-            width: 100%; height: 8px; background: rgba(255,255,255,0.1); 
-            border-radius: 20px; overflow: hidden; position: relative;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .loader-fill { 
-            width: 0%; height: 100%; background: linear-gradient(90deg, var(--secondary-neon), var(--primary-neon)); 
-            transition: width 2.5s cubic-bezier(0.1, 0.5, 0.5, 1); 
-            box-shadow: 0 0 20px var(--primary-neon);
-        }
-
-        /* Partículas de fundo no Loading */
-        .loading-particle {
-            position: absolute; background: white; border-radius: 50%;
-            opacity: 0.3; animation: floatParticle 5s infinite linear;
-        }
-
-        @keyframes floatParticle {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 0.5; }
-            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
-        }
-
+        .loader-logo { font-size: 32px; font-weight: 800; color: var(--primary-neon); text-shadow: 0 0 20px var(--primary-neon); margin-bottom: 20px; }
+        .loader-bar { width: 200px; height: 4px; background: #222; border-radius: 10px; overflow: hidden; }
+        .loader-fill { width: 0%; height: 100%; background: var(--primary-neon); transition: width 2s ease; box-shadow: 0 0 10px var(--primary-neon); }
         .enter-btn { 
-            margin-top: 40px; padding: 18px 50px; border-radius: 50px; 
-            border: none; background: white; color: black; font-weight: 900; 
-            cursor: pointer; display: none; z-index: 2;
-            box-shadow: 0 0 30px white; text-transform: uppercase;
-            animation: btnSlideUp 0.5s ease-out forwards;
+            margin-top: 30px; padding: 15px 40px; border-radius: 30px; border: 2px solid var(--primary-neon);
+            background: transparent; color: white; font-weight: bold; cursor: pointer; display: none;
+            box-shadow: 0 0 15px var(--primary-neon); text-transform: uppercase;
         }
-
-        @keyframes btnSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* --- RESTO DO APP --- */
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #0f001f; }
 
         body {
             margin: 0; background: transparent; color: white;
             font-family: 'Poppins', 'Segoe UI', sans-serif; height: 100vh;
-            display: flex; flex-direction: column; align-items: center; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
+            overflow: hidden;
         }
 
-        .creator-tag { font-size: 10px; color: rgba(255, 255, 255, 0.5); letter-spacing: 1px; text-transform: uppercase; margin-top: -5px; margin-bottom: 15px; }
+        .creator-tag {
+            font-size: 10px; color: rgba(255, 255, 255, 0.5); letter-spacing: 1px;
+            text-transform: uppercase; margin-top: -5px; margin-bottom: 15px;
+        }
 
         @keyframes cardBounce {
             0% { transform: scale(1); }
@@ -86,18 +53,26 @@
         }
         .card-change-anim { animation: cardBounce 0.5s ease-out; }
 
-        .roulette-icon { position: absolute; top: 20px; right: 20px; font-size: 32px; cursor: pointer; z-index: 100; filter: drop-shadow(0 0 8px var(--gold-neon)); }
+        .roulette-icon {
+            position: absolute; top: 20px; right: 20px; font-size: 32px;
+            cursor: pointer; z-index: 100; filter: drop-shadow(0 0 8px var(--gold-neon));
+        }
 
         #roulette-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(10, 0, 20, 0.98); z-index: 1000; display: none;
-            flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px);
+            flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(15px);
         }
 
-        .close-roulette { position: absolute; top: 25px; right: 25px; font-size: 35px; color: var(--secondary-neon); font-weight: bold; cursor: pointer; }
+        .close-roulette {
+            position: absolute; top: 25px; right: 25px; font-size: 35px;
+            color: var(--secondary-neon); font-weight: bold; cursor: pointer;
+        }
 
         .roulette-container {
-            width: 260px; height: 260px; border-radius: 50%; border: 8px solid #222; position: relative;
+            width: 260px; height: 260px; border-radius: 50%;
+            border: 8px solid #222; position: relative;
             display: flex; align-items: center; justify-content: center;
             background: conic-gradient(from 0deg, #111, #222, #111, #333, #111);
             box-shadow: inset 0 0 50px #000, 0 0 30px var(--gold-neon);
@@ -162,12 +137,9 @@
     <canvas id="bg-canvas"></canvas>
 
     <div id="loading-screen">
-        <div id="loading-bg-elements"></div>
         <div class="loader-logo">REVELA OU PAGA</div>
-        <div class="loader-container">
-            <div class="loader-bar"><div class="loader-fill" id="fill"></div></div>
-        </div>
-        <button class="enter-btn" id="enter-btn" onclick="startGame()">JOGAR AGORA</button>
+        <div class="loader-bar"><div class="loader-fill" id="fill"></div></div>
+        <button class="enter-btn" id="enter-btn" onclick="startGame()">ENTRAR NO JOGO</button>
     </div>
 
     <div class="roulette-icon" onclick="openRouletteWithSound()">🎡</div>
@@ -262,7 +234,7 @@
     initCanvas();
     animateBg();
 
-    // --- SISTEMA DE ÁUDIO ---
+    // --- SISTEMA DE ÁUDIO DINÂMICO ---
     let audioCtx = null;
 
     function initAudio() {
@@ -292,21 +264,7 @@
         }, 4000);
     }
 
-    // Som de Entrada no Loading (Novo)
-    function playLoadingSound() {
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(100, now);
-        osc.frequency.exponentialRampToValueAtTime(800, now + 0.5);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(now + 0.5);
-    }
-
+    // Som para o ícone da roleta (Novo)
     function playIconSound() {
         if (!audioCtx) return;
         const now = audioCtx.currentTime;
@@ -367,37 +325,23 @@
         }, 80);
     }
 
-    // --- LÓGICA DO LOADING ---
     window.onload = () => {
         const fill = document.getElementById('fill');
         const btn = document.getElementById('enter-btn');
-        const bgElements = document.getElementById('loading-bg-elements');
-        
-        // Criar partículas de loading
-        for(let i=0; i<30; i++) {
-            const p = document.createElement('div');
-            p.className = 'loading-particle';
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.width = p.style.height = (Math.random() * 5 + 2) + 'px';
-            p.style.animationDelay = Math.random() * 5 + 's';
-            bgElements.appendChild(p);
-        }
-
         setTimeout(() => { fill.style.width = "100%"; }, 100);
-        setTimeout(() => { btn.style.display = "block"; }, 2600);
+        setTimeout(() => { btn.style.display = "block"; }, 2100);
     };
 
     function startGame() {
         initAudio();
-        playLoadingSound();
         document.getElementById('loading-screen').style.opacity = "0";
-        setTimeout(() => { document.getElementById('loading-screen').style.display = "none"; }, 1000);
+        setTimeout(() => { document.getElementById('loading-screen').style.display = "none"; }, 800);
     }
 
-    // --- LÓGICA DO JOGO ---
     let players = [];
     let isSpinning = false;
 
+    // Função para abrir a roleta com som
     function openRouletteWithSound() {
         playIconSound();
         toggleRoulette();
@@ -449,27 +393,43 @@
         'Amigos': {
             verdade: [
                 "Qual seu crush secreto hoje?", "Já mentiu para alguém nesta roda?", "Beijaria alguém aqui por 100 reais?", "Pior mico que passou?", "Ilha deserta com quem?", 
-                "Quem aqui é a pessoa mais chata?", "Qual foi a última mentira que você contou?", "Já pegou algum ex de amigo?", "Qual seu hábito mais estranho?"
+                "Quem aqui é a pessoa mais chata?", "Qual foi a última mentira que você contou?", "Já pegou algum ex de amigo?", "Qual seu hábito mais estranho?",
+                "Se pudesse trocar de vida com alguém aqui, quem seria?", "Qual seu maior medo no amor?", "O que você achou da primeira pessoa que conheceu aqui?",
+                "Já fingiu estar doente para não sair?", "Qual a coisa mais infantil que você ainda faz?", "Quem aqui você nunca deixaria cuidar dos seus filhos?",
+                "Já stalkeou alguém hoje?", "O que você faria se ganhasse na loteria agora?", "Qual sua maior insecurity?", "Já chorou por causa de um filme de desenho?"
             ],
             desafio: [
                 "Imite um macaco por 30 segundos.", "Mande um emoji de coração pro seu crush.", "Tente lamber seu cotovelo.", "Dança ridícula sem música.",
-                "Fale com sotaque de outro estado até sua próxima vez."
+                "Fale com sotaque de outro estado até sua próxima vez.", "Deixe alguém postar um 'Oi' no seu Instagram.", "Ligue para um contato aleatório e cante 'Parabéns'.",
+                "Faça 15 flexões ou pague um lanche pro dono do celular.", "Fique 1 rodada sem falar nada.", "Imite alguém da roda até descobrirem quem é.",
+                "Tente equilibrar uma colher no nariz por 1 minuto.", "Mande uma mensagem para sua mãe dizendo que vai casar amanhã.", "Faça uma pose de modelo e fique assim por 30 segundos.",
+                "Deixe alguém da roda ver sua última foto na galeria.", "Tome um copo de água sem usar as mãos."
             ]
         },
         'Pesado': {
             verdade: [
-                "Qual sua maior fantasia?", "Já beijou alguém nesta roda?", "Mandou nudes recentemente?", "Já teve sonho erótico com alguém daqui?", "Qual seu ponto mais sensível?"
+                "Qual sua maior fantasia?", "Já beijou alguém nesta roda?", "Mandou nudes recentemente?", "Já teve sonho erótico com alguém daqui?", "Qual seu ponto mais sensível?",
+                "Luz acesa ou apagada na hora H?", "Já transou no carro?", "Qual sua posição favorita?", "Sente no colo por 1 rodada.", "Qual foi o lugar mais estranho que você já ficou com alguém?",
+                "Já foi pego no flagra?", "Prefere dominar ou ser dominado?", "Qual o nome da pessoa que você mais se arrepende de ter ficado?", "Já usou algum brinquedo?",
+                "Quem aqui você teria coragem de ter uma amizade colorida?", "Tamanho realmente importa para você?", "Já beijou alguém do mesmo sexo?", "Qual sua maior loucura na cama?"
             ],
             desafio: [
-                "Beijo no pescoço da pessoa à sua esquerda.", "Mande uma mensagem ousada pro último match do Tinder.", "Tire uma peça de roupa."
+                "Beijo no pescoço da pessoa à sua esquerda.", "Mande uma mensagem ousada pro último match do Tinder.", "Tire uma peça de roupa.", "Lamba o pescoço da pessoa à frente.",
+                "Sussurre algo picante no ouvido de alguém.", "Faça uma massagem nos pés de quem está à sua direita.", "Fique apenas de roupa íntima (ou pague 5 doses/micos).",
+                "Deixe alguém da roda morder seu lábio levemente.", "Tente tirar a camiseta de alguém usando apenas os dentes.", "Faça um 'lap dance' de 20 segundos em alguém da roda.",
+                "Mande um áudio gemendo para um amigo próximo.", "Deixe alguém cheirar seu pescoço.", "Coma uma fruta de forma sensual olhando para alguém."
             ]
         },
         'Família': {
             verdade: [
-                "Quem é o filho favorito?", "Qual segredo você esconde dos seus pais?", "Lembrança de infância mais engraçada?", "Já culpou seu irmão por um erro seu?"
+                "Quem é o filho favorito?", "Qual segredo você esconde dos seus pais?", "Lembrança de infância mais engraçada?", "Já culpou seu irmão por um erro seu?",
+                "Qual a maior bronca que você já levou?", "Quem da família é o mais preguiçoso?", "O que você faria com o dinheiro da herança?", "Já quebrou algo e escondeu?",
+                "Qual parente você não suporta em festas?", "Quem aqui cozinha melhor?", "Qual apelido de infância você odeia?", "Já fingiu gostar de um presente de Natal?"
             ],
             desafio: [
-                "Lave a louça da próxima refeição.", "Conte uma piada ruim e faça todos rirem.", "Mímica de um animal difícil."
+                "Lave a louça da próxima refeição.", "Conte uma piada ruim e faça todos rirem.", "Mímica de um animal difícil.", "Imite seu pai ou sua mãe agora.",
+                "Ligue para um parente e diga que o ama do nada.", "Faça um café para quem está jogando.", "Dance uma música antiga da Xuxa.",
+                "Arume uma gaveta da casa agora.", "Fique 2 minutos sem usar o celular.", "Faça uma declaração de amor para um pet da casa."
             ]
         }
     };
@@ -526,3 +486,4 @@
 </script>
 </body>
 </html>
+
