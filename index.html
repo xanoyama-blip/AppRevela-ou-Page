@@ -9,60 +9,79 @@
             --primary-neon: #00f2fe;
             --secondary-neon: #ff0055;
             --gold-neon: #ffbd39;
-            --bg-dark: #0f001f;
-        }
-
-        /* --- ANIMAÇÃO DE FUNDO DINÂMICO --- */
-        #bg-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; background: radial-gradient(circle at 50% 50%, #1a0033 0%, #0f001f 100%);
-        }
-
-        /* --- TELA DE CARREGAMENTO --- */
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease;
-        }
-        .loader-logo { font-size: 32px; font-weight: 800; color: var(--primary-neon); text-shadow: 0 0 20px var(--primary-neon); margin-bottom: 20px; }
-        .loader-bar { width: 200px; height: 4px; background: #222; border-radius: 10px; overflow: hidden; }
-        .loader-fill { width: 0%; height: 100%; background: var(--primary-neon); transition: width 2s ease; box-shadow: 0 0 10px var(--primary-neon); }
-        .enter-btn { 
-            margin-top: 30px; padding: 15px 40px; border-radius: 30px; border: 2px solid var(--primary-neon);
-            background: transparent; color: white; font-weight: bold; cursor: pointer; display: none;
-            box-shadow: 0 0 15px var(--primary-neon); text-transform: uppercase;
+            --bg-dark: #0a001a;
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
         body {
-            margin: 0; background: transparent; color: white;
+            margin: 0; background: var(--bg-dark); color: white;
             font-family: 'Poppins', 'Segoe UI', sans-serif; height: 100vh;
             display: flex; flex-direction: column; align-items: center;
+            overflow: hidden; position: relative;
+        }
+
+        /* --- ANIMAÇÕES DE FUNDO --- */
+        .bg-animate {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; background: var(--bg-dark);
             overflow: hidden;
         }
 
+        .nebula {
+            position: absolute; width: 500px; height: 500px;
+            border-radius: 50%; filter: blur(80px); opacity: 0.15;
+            animation: moveNebula 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes moveNebula {
+            from { transform: translate(-10%, -10%) scale(1); }
+            to { transform: translate(20%, 20%) scale(1.2); }
+        }
+
+        .stars-overlay {
+            position: absolute; width: 100%; height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+            opacity: 0.3;
+        }
+
+        .shooting-star {
+            position: absolute; width: 2px; height: 2px; background: white;
+            box-shadow: 0 0 10px white, 0 0 20px var(--primary-neon);
+            opacity: 0; animation: shoot 8s infinite linear;
+        }
+
+        @keyframes shoot {
+            0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 0; }
+            10% { opacity: 1; }
+            20% { transform: translateX(-500px) translateY(500px) rotate(-45deg); opacity: 0; }
+            100% { opacity: 0; }
+        }
+
         .creator-tag {
-            font-size: 10px; color: rgba(255, 255, 255, 0.5); letter-spacing: 1px;
+            font-size: 10px; color: rgba(255, 255, 255, 0.4); letter-spacing: 1px;
             text-transform: uppercase; margin-top: -5px; margin-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.2);
         }
 
         @keyframes cardBounce {
             0% { transform: scale(1); }
-            30% { transform: scale(1.08) translateY(-10px); filter: brightness(1.5); }
-            100% { transform: scale(1) translateY(0); filter: brightness(1); }
+            30% { transform: scale(1.05); filter: brightness(1.2); }
+            100% { transform: scale(1); filter: brightness(1); }
         }
-        .card-change-anim { animation: cardBounce 0.5s ease-out; }
+        .card-change-anim { animation: cardBounce 0.4s ease-out; }
 
         .roulette-icon {
             position: absolute; top: 20px; right: 20px; font-size: 32px;
             cursor: pointer; z-index: 100; filter: drop-shadow(0 0 8px var(--gold-neon));
+            transition: transform 0.3s;
         }
+        .roulette-icon:active { transform: scale(0.9) rotate(-20deg); }
 
         #roulette-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 0, 20, 0.98); z-index: 1000; display: none;
+            background: rgba(10, 0, 25, 0.98); z-index: 1000; display: none;
             flex-direction: column; align-items: center; justify-content: center;
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(10px);
         }
 
         .close-roulette {
@@ -72,10 +91,10 @@
 
         .roulette-container {
             width: 260px; height: 260px; border-radius: 50%;
-            border: 8px solid #222; position: relative;
+            border: 6px solid #333; position: relative;
             display: flex; align-items: center; justify-content: center;
             background: conic-gradient(from 0deg, #111, #222, #111, #333, #111);
-            box-shadow: inset 0 0 50px #000, 0 0 30px var(--gold-neon);
+            box-shadow: 0 0 40px rgba(255, 189, 57, 0.3);
             transition: transform 5s cubic-bezier(0.15, 0, 0, 1);
         }
 
@@ -84,17 +103,31 @@
         @keyframes winPulse { from { transform: scale(1); } to { transform: scale(1.1); } }
 
         header { padding: 25px 20px 5px; text-align: center; }
-        header h1 { margin:0; font-size: 26px; font-weight: 800; text-shadow: 0 0 10px var(--primary-neon); }
-
-        .categories { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
-        .cat-btn {
-            background: #222; border: 1px solid var(--gold-neon); color: white;
-            padding: 10px 18px; border-radius: 20px; font-size: 11px; cursor: pointer;
-            text-transform: uppercase; font-weight: bold; transition: 0.3s;
+        header h1 { 
+            margin:0; font-size: 28px; font-weight: 900; 
+            text-shadow: 0 0 15px var(--primary-neon); 
+            letter-spacing: 1px;
+            animation: glowText 3s infinite alternate;
         }
-        .cat-btn.active { background: var(--primary-neon); color: black; transform: scale(1.05); }
 
-        .scene { width: 300px; height: 380px; perspective: 1200px; }
+        @keyframes glowText {
+            from { text-shadow: 0 0 5px var(--primary-neon); }
+            to { text-shadow: 0 0 20px var(--primary-neon), 0 0 30px var(--primary-neon); }
+        }
+
+        .categories { display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; }
+        .cat-btn {
+            background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: white;
+            padding: 10px 15px; border-radius: 12px; font-size: 10px; cursor: pointer;
+            text-transform: uppercase; font-weight: bold; transition: 0.2s;
+            backdrop-filter: blur(5px);
+        }
+        .cat-btn.active { 
+            background: var(--primary-neon); color: black; 
+            border-color: var(--primary-neon); box-shadow: 0 0 15px var(--primary-neon);
+        }
+
+        .scene { width: 280px; height: 360px; perspective: 1200px; }
         .card {
             width: 100%; height: 100%; position: relative;
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -106,43 +139,53 @@
             position: absolute; width: 100%; height: 100%;
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 20px; border: 4px solid var(--gold-neon); box-sizing: border-box;
+            border-radius: 24px; border: 3px solid var(--gold-neon); box-sizing: border-box;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
-        .card-front { background: #1a0033; }
-        .card-front::after { content: "🃏"; font-size: 80px; filter: drop-shadow(0 0 10px var(--gold-neon)); }
-        .card-back { background: #fff; color: #111; transform: rotateY(180deg); padding: 25px; text-align: center; }
+        .card-front { 
+            background: linear-gradient(135deg, #1a0033 0%, #0f001f 100%);
+            background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+        }
+        .card-front::after { content: "🃏"; font-size: 70px; filter: drop-shadow(0 0 10px var(--gold-neon)); }
         
-        .type-label { font-weight: 800; text-transform: uppercase; margin-bottom: 15px; font-size: 22px; }
-        .content-text { font-size: 17px; line-height: 1.4; font-weight: 600; }
+        .card-back { background: white; color: #111; transform: rotateY(180deg); padding: 25px; text-align: center; }
+        
+        .type-label { font-weight: 900; text-transform: uppercase; margin-bottom: 12px; font-size: 20px; }
+        .content-text { font-size: 16px; line-height: 1.4; font-weight: 600; color: #333; }
 
-        .controls { display: flex; gap: 20px; margin-top: 25px; }
+        .controls { display: flex; gap: 15px; margin-top: 25px; }
         .btn-action {
-            width: 100px; height: 100px; border-radius: 50%; border: 2px solid transparent;
-            color: white; font-weight: 800; font-size: 13px; cursor: pointer; background: rgba(0,0,0,0.3);
+            width: 90px; height: 90px; border-radius: 50%; border: 3px solid transparent;
+            color: white; font-weight: 800; font-size: 11px; cursor: pointer; 
+            background: rgba(0,0,0,0.4); transition: 0.2s;
         }
-        .verdade { border-color: var(--primary-neon); color: var(--primary-neon); }
-        .desafio { border-color: var(--secondary-neon); color: var(--secondary-neon); }
+        .btn-action:active { transform: scale(0.9); }
+        .verdade { border-color: var(--primary-neon); box-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
+        .desafio { border-color: var(--secondary-neon); box-shadow: 0 0 10px rgba(255, 0, 85, 0.3); }
 
-        .custom-area { margin-top: auto; padding: 20px; width: 100%; box-sizing: border-box; }
+        .custom-area { margin-top: auto; padding: 20px; width: 100%; box-sizing: border-box; position: relative; z-index: 5;}
         .input-group { display: flex; gap: 8px; }
-        input { flex: 1; background: #222; border: 1px solid #444; color: white; padding: 12px; border-radius: 10px; outline: none; }
-        .add-btn { background: var(--gold-neon); color: #000; padding: 0 15px; border-radius: 10px; font-weight: bold; border: none; cursor: pointer; }
+        input { 
+            flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); 
+            color: white; padding: 12px; border-radius: 12px; outline: none; 
+        }
+        .add-btn { background: var(--gold-neon); color: #000; padding: 0 15px; border-radius: 10px; font-weight: 900; border: none; cursor: pointer; }
         
-        .player-tag { display: inline-block; background: rgba(0, 242, 254, 0.2); color: var(--primary-neon); padding: 6px 12px; border-radius: 8px; margin: 4px; font-size: 13px; border: 1px solid var(--primary-neon); }
+        .player-tag { display: inline-block; background: rgba(0, 242, 254, 0.1); color: var(--primary-neon); padding: 6px 12px; border-radius: 8px; margin: 4px; font-size: 12px; border: 1px solid rgba(0, 242, 254, 0.3); }
     </style>
 </head>
-<body>
+<body onclick="playGameMusic()">
 
-    <canvas id="bg-canvas"></canvas>
-
-    <div id="loading-screen">
-        <div class="loader-logo">REVELA OU PAGA</div>
-        <div class="loader-bar"><div class="loader-fill" id="fill"></div></div>
-        <button class="enter-btn" id="enter-btn" onclick="startGame()">ENTRAR NO JOGO</button>
+    <div class="bg-animate">
+        <div class="stars-overlay"></div>
+        <div class="nebula" style="background: var(--primary-neon); top: -100px; left: -100px;"></div>
+        <div class="nebula" style="background: var(--secondary-neon); bottom: -100px; right: -100px; animation-delay: -5s;"></div>
+        <div class="shooting-star" style="top: 10%; right: 10%; animation-delay: 2s;"></div>
+        <div class="shooting-star" style="top: 40%; right: -50px; animation-delay: 5s;"></div>
     </div>
 
-    <div class="roulette-icon" onclick="openRouletteWithSound()">🎡</div>
+    <div class="roulette-icon" onclick="toggleRoulette()">🎡</div>
 
     <div id="roulette-modal">
         <div class="close-roulette" onclick="toggleRoulette()">✖</div>
@@ -166,7 +209,7 @@
     <header>
         <h1>REVELA OU PAGA</h1>
         <div class="creator-tag">Criador: Leonardo Silva</div>
-        <small id="mode-info" style="color:var(--primary-neon)">MODO: AMIGOS</small>
+        <small id="mode-info" style="color:var(--primary-neon); font-weight: bold;">MODO: AMIGOS</small>
     </header>
 
     <div class="categories">
@@ -198,161 +241,65 @@
     </div>
 
 <script>
-    // --- CANVAS BACKGROUND ANIMATION ---
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let musicActive = false;
 
-    function initCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        particles = [];
-        for(let i = 0; i < 50; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 2 + 1,
-                speed: Math.random() * 0.5 + 0.1,
-                opacity: Math.random()
+    function tone(freq, type, dur, vol, slide = 0) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        if (slide > 0) osc.frequency.exponentialRampToValueAtTime(slide, audioCtx.currentTime + dur);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + dur);
+    }
+
+    function playGameMusic() {
+        if (musicActive) return;
+        musicActive = true;
+        const notes = [329.63, 392.00, 440.00, 523.25];
+        let i = 0;
+        setInterval(() => {
+            tone(notes[i], 'sine', 1, 0.02);
+            if (i % 2 === 0) tone(notes[i] * 2, 'triangle', 0.2, 0.01);
+            i = (i + 1) % notes.length;
+        }, 600);
+    }
+
+    const gameSFX = {
+        tap: () => tone(800, 'sine', 0.1, 0.06, 1200),
+        card: () => { 
+            tone(400, 'triangle', 0.15, 0.1); 
+            setTimeout(() => tone(900, 'sine', 0.1, 0.05), 40);
+        },
+        swipe: () => tone(200, 'sawtooth', 0.2, 0.04, 800),
+        roulette: () => {
+            let count = 0;
+            const timer = setInterval(() => {
+                tone(300 + (count * 20), 'square', 0.05, 0.02);
+                if (++count > 30) clearInterval(timer);
+            }, 100);
+        },
+        win: () => {
+            [523, 659, 783, 1046].forEach((f, i) => {
+                setTimeout(() => tone(f, 'sine', 0.5, 0.08), i * 120);
             });
         }
-    }
-
-    function animateBg() {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        particles.forEach(p => {
-            p.y -= p.speed;
-            if(p.y < 0) p.y = canvas.height;
-            ctx.fillStyle = `rgba(0, 242, 254, ${p.opacity})`;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
-        requestAnimationFrame(animateBg);
-    }
-    window.addEventListener('resize', initCanvas);
-    initCanvas();
-    animateBg();
-
-    // --- SISTEMA DE ÁUDIO DINÂMICO ---
-    let audioCtx = null;
-
-    function initAudio() {
-        if (audioCtx) return;
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        startAmbientLoop();
-    }
-
-    function startAmbientLoop() {
-        const playNote = (freq, time, volume) => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, time);
-            gain.gain.setValueAtTime(0, time);
-            gain.gain.linearRampToValueAtTime(volume, time + 0.1);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 2);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(time); osc.stop(time + 2);
-        };
-        setInterval(() => {
-            let now = audioCtx.currentTime;
-            playNote(261.63, now, 0.05);
-            playNote(329.63, now + 1, 0.05);
-            playNote(392.00, now + 2, 0.05);
-            playNote(349.23, now + 3, 0.05);
-        }, 4000);
-    }
-
-    // Som para o ícone da roleta (Novo)
-    function playIconSound() {
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.exponentialRampToValueAtTime(900, now + 0.1);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(now + 0.2);
-    }
-
-    function playCategorySound() {
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, now);
-        osc.frequency.linearRampToValueAtTime(600, now + 0.1);
-        osc.frequency.linearRampToValueAtTime(800, now + 0.2);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(now + 0.3);
-    }
-
-    function playCardSound() {
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(500, now);
-        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(now + 0.3);
-    }
-
-    function playRouletteSound() {
-        if (!audioCtx) return;
-        let playCount = 0;
-        const interval = setInterval(() => {
-            const osc = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(150 + (playCount * 5), audioCtx.currentTime);
-            g.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-            osc.connect(g); g.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.08);
-            playCount++;
-            if (playCount > 50) clearInterval(interval);
-        }, 80);
-    }
-
-    window.onload = () => {
-        const fill = document.getElementById('fill');
-        const btn = document.getElementById('enter-btn');
-        setTimeout(() => { fill.style.width = "100%"; }, 100);
-        setTimeout(() => { btn.style.display = "block"; }, 2100);
     };
-
-    function startGame() {
-        initAudio();
-        document.getElementById('loading-screen').style.opacity = "0";
-        setTimeout(() => { document.getElementById('loading-screen').style.display = "none"; }, 800);
-    }
 
     let players = [];
     let isSpinning = false;
-
-    // Função para abrir a roleta com som
-    function openRouletteWithSound() {
-        playIconSound();
-        toggleRoulette();
-    }
     
     function toggleRoulette() {
+        gameSFX.tap();
         const modal = document.getElementById('roulette-modal');
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
     }
 
     function addPlayer() {
+        gameSFX.tap();
         const input = document.getElementById('player-name');
         if (input.value.trim() !== "") {
             players.push(input.value.trim());
@@ -368,7 +315,7 @@
     function spinWheel() {
         if (players.length < 2 || isSpinning) return;
         isSpinning = true;
-        playRouletteSound();
+        gameSFX.roulette();
         const wheel = document.getElementById('wheel');
         const display = document.getElementById('winner-display');
         display.innerText = "SORTEANDO...";
@@ -376,6 +323,7 @@
         const deg = Math.floor(Math.random() * 360) + 5000; 
         wheel.style.transform = `rotate(${deg}deg)`;
         setTimeout(() => {
+            gameSFX.win();
             display.innerText = players[Math.floor(Math.random() * players.length)];
             display.classList.add('win-anim');
             isSpinning = false;
@@ -392,52 +340,46 @@
     const db = {
         'Amigos': {
             verdade: [
-                "Qual seu crush secreto hoje?", "Já mentiu para alguém nesta roda?", "Beijaria alguém aqui por 100 reais?", "Pior mico que passou?", "Ilha deserta com quem?", 
-                "Quem aqui é a pessoa mais chata?", "Qual foi a última mentira que você contou?", "Já pegou algum ex de amigo?", "Qual seu hábito mais estranho?",
-                "Se pudesse trocar de vida com alguém aqui, quem seria?", "Qual seu maior medo no amor?", "O que você achou da primeira pessoa que conheceu aqui?",
-                "Já fingiu estar doente para não sair?", "Qual a coisa mais infantil que você ainda faz?", "Quem aqui você nunca deixaria cuidar dos seus filhos?",
-                "Já stalkeou alguém hoje?", "O que você faria se ganhasse na loteria agora?", "Qual sua maior insecurity?", "Já chorou por causa de um filme de desenho?"
+                "Qual seu crush secreto hoje?", "Já mentiu para alguém nesta roda?", "Beijaria alguém aqui por 100 reais?", "Pior mico que passou?", "Ilha deserta com quem?", "Quem aqui é a pessoa mais chata?", "Qual foi a última mentira que você contou?", "Já pegou algum ex de amigo?", "Qual seu hábito mais estranho?", "Se pudesse trocar de vida com alguém aqui, quem seria?", "Qual seu maior medo no amor?", "O que você achou da primeira pessoa que conheceu aqui?", "Já fingiu estar doente para não sair?", "Qual a coisa mais infantil que você ainda faz?", "Quem aqui você nunca deixaria cuidar dos seus filhos?", "Já stalkeou alguém hoje?", "O que você faria se ganhasse na loteria agora?", "Qual sua maior insegurança?", "Já chorou por causa de um filme de desenho?",
+                /* +20 Novas Perguntas Curiosas */
+                "Qual a coisa mais cara que você já comprou e se arrependeu?", "Qual o sonho mais estranho que você já teve?", "Você acredita em ETs?", "Qual sua mania mais irritante?", "Já mandou mensagem pro grupo errado?", "Qual sua rede social favorita?", "Se você fosse um animal, qual seria?", "Já pesquisou seu próprio nome no Google?", "Qual música você tem vergonha de gostar?", "Qual a sua maior conquista até hoje?", "Você prefere viajar pro futuro ou pro passado?", "Qual o seu maior talento oculto?", "Já teve uma experiência paranormal?", "Qual a primeira coisa que você olha em alguém?", "Você se considera uma pessoa ciumenta?", "O que você faria se fosse invisível por um dia?", "Qual sua comida favorita que ninguém mais gosta?", "Já deu um 'gelo' em alguém por motivo bobo?", "Qual foi o último app que você baixou?", "Qual a coisa mais corajosa que já fez?"
             ],
             desafio: [
-                "Imite um macaco por 30 segundos.", "Mande um emoji de coração pro seu crush.", "Tente lamber seu cotovelo.", "Dança ridícula sem música.",
-                "Fale com sotaque de outro estado até sua próxima vez.", "Deixe alguém postar um 'Oi' no seu Instagram.", "Ligue para um contato aleatório e cante 'Parabéns'.",
-                "Faça 15 flexões ou pague um lanche pro dono do celular.", "Fique 1 rodada sem falar nada.", "Imite alguém da roda até descobrirem quem é.",
-                "Tente equilibrar uma colher no nariz por 1 minuto.", "Mande uma mensagem para sua mãe dizendo que vai casar amanhã.", "Faça uma pose de modelo e fique assim por 30 segundos.",
-                "Deixe alguém da roda ver sua última foto na galeria.", "Tome um copo de água sem usar as mãos."
+                "Imite um macaco por 30 segundos.", "Mande um emoji de coração pro seu crush.", "Tente lamber seu cotovelo.", "Dança ridícula sem música.", "Fale com sotaque de outro estado até sua próxima vez.", "Deixe alguém postar um 'Oi' no seu Instagram.", "Ligue para um contato aleatório e cante 'Parabéns'.", "Faça 15 flexões ou pague um lanche pro dono do celular.", "Fique 1 rodada sem falar nada.", "Imite alguém da roda até descobrirem quem é.", "Tente equilibrar uma colher no nariz por 1 minuto.", "Mande uma mensagem para sua mãe dizendo que vai casar amanhã.", "Faça uma pose de modelo e fique assim por 30 segundos.", "Deixe alguém da roda ver sua última foto na galeria.", "Tome um copo de água sem usar as mãos.",
+                /* +20 Novos Desafios Engraçados */
+                "Fale rimando por 2 rodadas.", "Deixe alguém bagunçar seu cabelo e fique assim.", "Faça uma mímica de um filme e alguém tem que acertar.", "Tente não rir enquanto alguém te faz cócegas por 10 segundos.", "Desenhe um bigode em você mesmo (com caneta que sai).", "Beba um copo de água com sal (só um pouquinho!).", "Poste uma foto de infância vergonhosa nos stories.", "Fale como um robô por 1 minuto.", "Tente tocar os dedos dos pés sem dobrar o joelho.", "Mande um áudio para o quinto contato do WhatsApp dizendo 'Te amo'.", "Use as meias nas mãos até o fim do jogo.", "Finja que é um comentarista de futebol por 30 segundos.", "Dance 'Baby Shark' com toda a energia.", "Tente fazer um malabarismo com 3 objetos e falhe miseravelmente.", "Peça desculpas para uma parede por 20 segundos.", "Deixe alguém escrever algo no seu braço.", "Faça um freestyle de rap sobre a pessoa à sua esquerda.", "Equilibre o celular na cabeça por 30 segundos enquanto caminha.", "Imite um despertador até alguém te 'desligar'.", "Conte uma piada e se ninguém rir, pague 10 polichinelos."
             ]
         },
         'Pesado': {
             verdade: [
-                "Qual sua maior fantasia?", "Já beijou alguém nesta roda?", "Mandou nudes recentemente?", "Já teve sonho erótico com alguém daqui?", "Qual seu ponto mais sensível?",
-                "Luz acesa ou apagada na hora H?", "Já transou no carro?", "Qual sua posição favorita?", "Sente no colo por 1 rodada.", "Qual foi o lugar mais estranho que você já ficou com alguém?",
-                "Já foi pego no flagra?", "Prefere dominar ou ser dominado?", "Qual o nome da pessoa que você mais se arrepende de ter ficado?", "Já usou algum brinquedo?",
-                "Quem aqui você teria coragem de ter uma amizade colorida?", "Tamanho realmente importa para você?", "Já beijou alguém do mesmo sexo?", "Qual sua maior loucura na cama?"
+                "Qual sua maior fantasia?", "Já beijou alguém nesta roda?", "Mandou nudes recentemente?", "Já teve sonho erótico com alguém daqui?", "Qual seu ponto mais sensível?", "Luz acesa ou apagada na hora H?", "Já transou no carro?", "Qual sua posição favorita?", "Sente no colo por 1 rodada.", "Qual foi o lugar mais estranho que você já ficou com alguém?", "Já foi pego no flagra?", "Prefere dominar ou ser dominado?", "Qual o nome da pessoa que você mais se arrepende de ter ficado?", "Já usou algum brinquedo?", "Quem aqui você teria coragem de ter uma amizade colorida?", "Tamanho realmente importa para você?", "Já beijou alguém do mesmo sexo?", "Qual sua maior loucura na cama?",
+                /* +20 Perguntas Estranhas/Curiosas */
+                "Qual a coisa mais nojenta que você já fez sozinho?", "Qual seu pensamento mais estranho sobre alguém aqui?", "Já sentiu atração por um parente distante?", "Qual o cheiro mais estranho que você gosta?", "Já fingiu prazer para não magoar alguém?", "Qual a coisa mais bizarra que você já viu na internet?", "Já teve vontade de beijar um desconhecido no ônibus?", "Qual seu maior fetiche que ninguém sabe?", "Já usou a escova de dentes de outra pessoa?", "Qual o lugar mais sujo que você já frequentou?", "Você tem algum hábito higiênico duvidoso?", "Já falou sozinho no espelho fingindo ser outra pessoa?", "Qual foi a última vez que você chorou e por quê?", "Qual a parte do corpo das pessoas que você mais repara?", "Já teve um crush em algum personagem de desenho animado?", "Qual o segredo mais obscuro que você já descobriu de alguém?", "Você prefere ficar sem banho por uma semana ou sem internet?", "Qual o seu maior arrependimento 'debaixo dos lençóis'?", "Já mentiu o nome em uma balada?", "Qual a coisa mais estranha que você já comeu?",
+                /* +20 Perguntas/Desafios Suspeitos */
+                "Mostre o histórico do seu navegador agora.", "Qual a mensagem mais 'quente' que você recebeu hoje?", "Deixe alguém ler seus pedidos no iFood ou compras recentes.", "Quem nesta roda você levaria para um motel?", "Já fez algo ilegal e nunca foi pego?", "Dê o seu celular desbloqueado para a pessoa à sua frente por 1 minuto.", "Quem você deletaria da vida agora mesmo?", "Já traiu ou foi traído?", "Mande um 'Oi sumido(a)' para seu/sua ex.", "Qual a maior mentira que você já contou para seus pais?", "Já usou o celular de alguém escondido?", "Desafio: Mande um nude (ou simule um) para os seus rascunhos e mostre.", "Fique de mãos dadas com a pessoa à direita até a próxima rodada.", "Sente no chão e deixe alguém usar você como cadeira.", "Cheire o pé de alguém da roda.", "Mande uma mensagem para o seu chefe/professor dizendo 'Eu sei o que você fez'.", "Revele quanto dinheiro você tem na conta bancária.", "Tire os sapatos e as meias e deixe alguém tirar uma foto.", "Qual a coisa mais 'suspeita' que você já pesquisou no Google?", "Deixe alguém da roda enviar um SMS para qualquer contato seu."
             ],
             desafio: [
-                "Beijo no pescoço da pessoa à sua esquerda.", "Mande uma mensagem ousada pro último match do Tinder.", "Tire uma peça de roupa.", "Lamba o pescoço da pessoa à frente.",
-                "Sussurre algo picante no ouvido de alguém.", "Faça uma massagem nos pés de quem está à sua direita.", "Fique apenas de roupa íntima (ou pague 5 doses/micos).",
-                "Deixe alguém da roda morder seu lábio levemente.", "Tente tirar a camiseta de alguém usando apenas os dentes.", "Faça um 'lap dance' de 20 segundos em alguém da roda.",
-                "Mande um áudio gemendo para um amigo próximo.", "Deixe alguém cheirar seu pescoço.", "Coma uma fruta de forma sensual olhando para alguém."
+                "Beijo no pescoço da pessoa à sua esquerda.", "Mande uma mensagem ousada pro último match do Tinder.", "Tire uma peça de roupa.", "Lamba o pescoço da pessoa à frente.", "Sussurre algo picante no ouvido de alguém.", "Faça uma massagem nos pés de quem está à sua direita.", "Fique apenas de roupa íntima (ou pague 5 doses/micos).", "Deixe alguém da roda morder seu lábio levemente.", "Tente tirar a camiseta de alguém usando apenas os dentes.", "Faça um 'lap dance' de 20 segundos em alguém da roda.", "Mande um áudio gemendo para um amigo próximo.", "Deixe alguém da roda cheirar seu pescoço.", "Coma uma fruta de forma sensual olhando para alguém."
             ]
         },
         'Família': {
             verdade: [
-                "Quem é o filho favorito?", "Qual segredo você esconde dos seus pais?", "Lembrança de infância mais engraçada?", "Já culpou seu irmão por um erro seu?",
-                "Qual a maior bronca que você já levou?", "Quem da família é o mais preguiçoso?", "O que você faria com o dinheiro da herança?", "Já quebrou algo e escondeu?",
-                "Qual parente você não suporta em festas?", "Quem aqui cozinha melhor?", "Qual apelido de infância você odeia?", "Já fingiu gostar de um presente de Natal?"
+                "Quem é o filho favorito?", "Qual segredo você esconde dos seus pais?", "Lembrança de infância mais engraçada?", "Já culpou seu irmão por um erro seu?", "Qual a maior bronca que você já levou?", "Quem da família é o mais preguiçoso?", "O que você faria com o dinheiro da herança?", "Já quebrou algo e escondeu?", "Qual parente você não suporta em festas?", "Quem aqui cozinha melhor?", "Qual apelido de infância você odeia?", "Já fingiu gostar de um presente de Natal?",
+                /* +20 Perguntas de Família */
+                "Qual a maior loucura que seus pais já fizeram?", "Você já fugiu de casa?", "Qual a regra da casa que você mais odeia?", "Quem é o parente mais fofoqueiro?", "Qual a história de família que todo mundo conta em churrasco?", "Já pegou dinheiro escondido da carteira dos pais?", "Qual a maior mentira que você já contou para evitar um castigo?", "Quem da família você levaria para uma viagem espacial?", "Qual prato da sua mãe/vó é insuperável?", "Você prefere o Natal ou o Ano Novo em família?", "Qual a coisa mais embaraçosa que seus pais já fizeram na frente dos seus amigos?", "Já fingiu que estava dormindo para não ajudar a limpar a casa?", "Qual o maior mico que você passou em um evento de família?", "Quem da família você acha que seria o primeiro a morrer em um apocalipse zumbi?", "Qual a mania mais irritante do seu irmão/irmã?", "Você se vê morando perto da sua família no futuro?", "Qual o melhor conselho que você já recebeu de um parente?", "Já usou a roupa de alguém da família sem pedir?", "Quem é o 'queridinho' dos avós?", "Qual a maior tradição da sua família?"
             ],
             desafio: [
-                "Lave a louça da próxima refeição.", "Conte uma piada ruim e faça todos rirem.", "Mímica de um animal difícil.", "Imite seu pai ou sua mãe agora.",
-                "Ligue para um parente e diga que o ama do nada.", "Faça um café para quem está jogando.", "Dance uma música antiga da Xuxa.",
-                "Arume uma gaveta da casa agora.", "Fique 2 minutos sem usar o celular.", "Faça uma declaração de amor para um pet da casa."
+                "Lave a louça da próxima refeição.", "Conte uma piada ruim e faça todos rirem.", "Mímica de um animal difícil.", "Imite seu pai ou sua mãe agora.", "Ligue para um parente e diga que o ama do nada.", "Faça um café para quem está jogando.", "Dance uma música antiga da Xuxa.", "Arume uma gaveta da casa agora.", "Fique 2 minutos sem usar o celular.", "Faça uma declaração de amor para um pet da casa.",
+                /* +20 Desafios de Família */
+                "Organize os sapatos da sala.", "Dê um abraço de 30 segundos em quem está jogando com você.", "Faça uma massagem nos ombros de quem está à sua esquerda.", "Cante o hino nacional com uma voz engraçada.", "Vá até a cozinha e traga um copo de água para o 'rei' da rodada.", "Fique em silêncio absoluto por 3 rodadas.", "Faça 10 agachamentos gritando 'Eu amo minha família'.", "Deixe alguém da família mudar sua foto de perfil do WhatsApp por 10 minutos.", "Mande uma mensagem no grupo da família dizendo que ganhou na loteria.", "Tente equilibrar um livro na cabeça enquanto dá uma volta na sala.", "Imite um bebê chorando por 20 segundos.", "Faça uma careta e deixe alguém tirar uma foto.", "Diga algo que você admira em cada pessoa da roda.", "Ligue para um primo e conte uma fofoca falsa.", "Tente assobiar uma música famosa e alguém tem que adivinhar.", "Use o chinelo trocado até o final do jogo.", "Finja que é um garçom e sirva petiscos para todos.", "Faça uma rima com o nome de cada pessoa presente.", "Limpe a tela do celular de todo mundo que está jogando.", "Tente fazer um castelo de cartas com 5 cartas."
             ]
         }
     };
 
     function setCategory(cat) {
         if(currentCategory === cat) return;
+        gameSFX.swipe();
         currentCategory = cat;
-        playCategorySound();
         usedQuestions = [];
         scene.classList.remove('card-change-anim');
         void scene.offsetWidth; 
@@ -449,7 +391,7 @@
     }
 
     function pick(mode) {
-        playCardSound();
+        gameSFX.card();
         const list = db[currentCategory][mode === 'verdade' ? 'verdade' : 'desafio'];
         let available = list.filter(q => !usedQuestions.includes(q));
         if (available.length === 0) { usedQuestions = []; available = list; }
@@ -471,14 +413,15 @@
 
     function flipCard() { 
         if(cardText.innerText !== "Escolha um botão abaixo!") {
-            playCardSound();
-            card.classList.toggle('is-flipped');
+            gameSFX.card();
+            card.classList.toggle('is-flipped'); 
         }
     }
     
     function resetCard() { card.classList.remove('is-flipped'); cardText.innerText = "Escolha um botão abaixo!"; }
     
     function addCustom() {
+        gameSFX.tap();
         const input = document.getElementById('custom-text');
         if(input.value.trim() !== "") db[currentCategory].desafio.push(input.value);
         input.value = "";
@@ -486,4 +429,4 @@
 </script>
 </body>
 </html>
- 
+
