@@ -2,430 +2,220 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Revela ou Paga - O Jogo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zombie Regional - Oficial</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
     <style>
-        :root {
-            --primary-neon: #00f2fe;
-            --secondary-neon: #ff0055;
-            --gold-neon: #ffbd39;
-            --bg-dark: #0a001a;
-            --glass: rgba(255, 255, 255, 0.05);
-        }
-
-        body {
-            margin: 0; background: var(--bg-dark); color: white;
-            font-family: 'Poppins', 'Segoe UI', sans-serif; height: 100vh;
-            display: flex; flex-direction: column; align-items: center;
-            overflow: hidden; position: relative;
-        }
-
-        /* --- ANIMAÇÕES DE FUNDO --- */
-        .bg-animate {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; background: var(--bg-dark);
-            overflow: hidden;
-        }
-
-        .nebula {
-            position: absolute; width: 500px; height: 500px;
-            border-radius: 50%; filter: blur(80px); opacity: 0.15;
-            animation: moveNebula 20s infinite alternate ease-in-out;
-        }
-
-        @keyframes moveNebula {
-            from { transform: translate(-10%, -10%) scale(1); }
-            to { transform: translate(20%, 20%) scale(1.2); }
-        }
-
-        .stars-overlay {
-            position: absolute; width: 100%; height: 100%;
-            background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
-            opacity: 0.3;
-        }
-
-        .shooting-star {
-            position: absolute; width: 2px; height: 2px; background: white;
-            box-shadow: 0 0 10px white, 0 0 20px var(--primary-neon);
-            opacity: 0; animation: shoot 8s infinite linear;
-        }
-
-        @keyframes shoot {
-            0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 0; }
-            10% { opacity: 1; }
-            20% { transform: translateX(-500px) translateY(500px) rotate(-45deg); opacity: 0; }
-            100% { opacity: 0; }
-        }
-
-        .creator-tag {
-            font-size: 10px; color: rgba(255, 255, 255, 0.4); letter-spacing: 1px;
-            text-transform: uppercase; margin-top: -5px; margin-bottom: 15px;
-            border-bottom: 1px solid rgba(0, 242, 254, 0.2);
-        }
-
-        @keyframes cardBounce {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.05); filter: brightness(1.2); }
-            100% { transform: scale(1); filter: brightness(1); }
-        }
-        .card-change-anim { animation: cardBounce 0.4s ease-out; }
-
-        .roulette-icon {
-            position: absolute; top: 20px; right: 20px; font-size: 32px;
-            cursor: pointer; z-index: 100; filter: drop-shadow(0 0 8px var(--gold-neon));
-            transition: transform 0.3s;
-        }
-        .roulette-icon:active { transform: scale(0.9) rotate(-20deg); }
-
-        #roulette-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 0, 25, 0.98); z-index: 1000; display: none;
-            flex-direction: column; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .close-roulette {
-            position: absolute; top: 25px; right: 25px; font-size: 35px;
-            color: var(--secondary-neon); font-weight: bold; cursor: pointer;
-        }
-
-        .roulette-container {
-            width: 260px; height: 260px; border-radius: 50%;
-            border: 6px solid #333; position: relative;
-            display: flex; align-items: center; justify-content: center;
-            background: conic-gradient(from 0deg, #111, #222, #111, #333, #111);
-            box-shadow: 0 0 40px rgba(255, 189, 57, 0.3);
-            transition: transform 5s cubic-bezier(0.15, 0, 0, 1);
-        }
-
-        .result-name { margin-top: 25px; font-size: 28px; font-weight: 800; text-shadow: 0 0 15px var(--primary-neon); min-height: 40px; }
-        .win-anim { animation: winPulse 0.5s infinite alternate; }
-        @keyframes winPulse { from { transform: scale(1); } to { transform: scale(1.1); } }
-
-        header { padding: 25px 20px 5px; text-align: center; }
-        header h1 { 
-            margin:0; font-size: 28px; font-weight: 900; 
-            text-shadow: 0 0 15px var(--primary-neon); 
-            letter-spacing: 1px;
-            animation: glowText 3s infinite alternate;
-        }
-
-        @keyframes glowText {
-            from { text-shadow: 0 0 5px var(--primary-neon); }
-            to { text-shadow: 0 0 20px var(--primary-neon), 0 0 30px var(--primary-neon); }
-        }
-
-        .categories { display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; }
-        .cat-btn {
-            background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: white;
-            padding: 10px 15px; border-radius: 12px; font-size: 10px; cursor: pointer;
-            text-transform: uppercase; font-weight: bold; transition: 0.2s;
-            backdrop-filter: blur(5px);
-        }
-        .cat-btn.active { 
-            background: var(--primary-neon); color: black; 
-            border-color: var(--primary-neon); box-shadow: 0 0 15px var(--primary-neon);
-        }
-
-        .scene { width: 280px; height: 360px; perspective: 1200px; }
-        .card {
-            width: 100%; height: 100%; position: relative;
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d; cursor: pointer;
-        }
-        .card.is-flipped { transform: rotateY(180deg); }
-
-        .card-face {
-            position: absolute; width: 100%; height: 100%;
-            -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 24px; border: 3px solid var(--gold-neon); box-sizing: border-box;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        }
-
-        .card-front { 
-            background: linear-gradient(135deg, #1a0033 0%, #0f001f 100%);
-            background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
-        }
-        .card-front::after { content: "🃏"; font-size: 70px; filter: drop-shadow(0 0 10px var(--gold-neon)); }
+        :root { --primary: #ff004c; --player-color: #00ff88; --bg-dark: #0f0f13; --card-bg: #1a1a24; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-dark); font-family: sans-serif; color: white; overflow: hidden; }
+        .screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; box-sizing: border-box; }
+        .title span { color: var(--primary); }
+        input { width: 100%; max-width: 350px; padding: 12px; background: var(--card-bg); border: 1px solid #333; border-radius: 8px; color: white; margin-bottom: 10px; box-sizing: border-box; }
         
-        .card-back { background: white; color: #111; transform: rotateY(180deg); padding: 25px; text-align: center; }
-        
-        .type-label { font-weight: 900; text-transform: uppercase; margin-bottom: 12px; font-size: 20px; }
-        .content-text { font-size: 16px; line-height: 1.4; font-weight: 600; color: #333; }
+        .selection-group { width: 100%; max-width: 350px; margin: 15px 0; }
+        .custom-radio { display: block; margin-bottom: 8px; cursor: pointer; }
+        .radio-content { background: var(--card-bg); padding: 12px; border-radius: 8px; border: 2px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        input[type="radio"]:checked + .radio-content { border-color: var(--primary); background: #251a20; }
 
-        .controls { display: flex; gap: 15px; margin-top: 25px; }
-        .btn-action {
-            width: 90px; height: 90px; border-radius: 50%; border: 3px solid transparent;
-            color: white; font-weight: 800; font-size: 11px; cursor: pointer; 
-            background: rgba(0,0,0,0.4); transition: 0.2s;
-        }
-        .btn-action:active { transform: scale(0.9); }
-        .verdade { border-color: var(--primary-neon); box-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
-        .desafio { border-color: var(--secondary-neon); box-shadow: 0 0 10px rgba(255, 0, 85, 0.3); }
-
-        .custom-area { margin-top: auto; padding: 20px; width: 100%; box-sizing: border-box; position: relative; z-index: 5;}
-        .input-group { display: flex; gap: 8px; }
-        input { 
-            flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); 
-            color: white; padding: 12px; border-radius: 12px; outline: none; 
-        }
-        .add-btn { background: var(--gold-neon); color: #000; padding: 0 15px; border-radius: 10px; font-weight: 900; border: none; cursor: pointer; }
+        #start-btn { width: 100%; max-width: 350px; padding: 15px; background: var(--primary); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
         
-        .player-tag { display: inline-block; background: rgba(0, 242, 254, 0.1); color: var(--primary-neon); padding: 6px 12px; border-radius: 8px; margin: 4px; font-size: 12px; border: 1px solid rgba(0, 242, 254, 0.3); }
+        #map-screen { position: relative; width: 100%; height: 100vh; display: none; }
+        #map-area { width: 100%; height: 100%; background: #111; }
+        .map-ui { position: absolute; top: 0; width: 100%; padding: 10px; z-index: 1000; background: rgba(0,0,0,0.85); box-sizing: border-box; }
+        .stats-header { display: flex; justify-content: space-between; align-items: center; }
+        .badge { background: #000; padding: 4px 8px; border-radius: 10px; font-size: 0.75rem; border: 1px solid #444; }
+        .life-counter { color: #ff004c; font-weight: bold; font-size: 1.1rem; }
+        #game-msg { color: gold; font-size: 0.85rem; margin-top: 5px; text-align: center; font-weight: bold; }
     </style>
 </head>
-<body onclick="playGameMusic()">
+<body>
 
-    <div class="bg-animate">
-        <div class="stars-overlay"></div>
-        <div class="nebula" style="background: var(--primary-neon); top: -100px; left: -100px;"></div>
-        <div class="nebula" style="background: var(--secondary-neon); bottom: -100px; right: -100px; animation-delay: -5s;"></div>
-        <div class="shooting-star" style="top: 10%; right: 10%; animation-delay: 2s;"></div>
-        <div class="shooting-star" style="top: 40%; right: -50px; animation-delay: 5s;"></div>
+    <div id="home-screen" class="screen">
+        <h1 style="font-size: 1.8rem;">ZOMBIE <span>REGIONAL</span></h1>
+        <div style="width: 100%; max-width: 350px; display: flex; flex-direction: column;">
+            <input type="text" id="user-name" placeholder="Seu Nome">
+            <input type="number" id="user-age" placeholder="Idade">
+            <input type="text" id="city-input" placeholder="Sua Cidade">
+        </div>
+
+        <div class="selection-group">
+            <label class="custom-radio">
+                <input type="radio" name="game-mode" value="multi" checked style="display:none">
+                <div class="radio-content">
+                    <span>MODO ONLINE</span>
+                    <small id="vagas-texto" style="color:var(--player-color)">Vagas: --</small>
+                </div>
+            </label>
+            <label class="custom-radio">
+                <input type="radio" name="game-mode" value="global" style="display:none">
+                <div class="radio-content">
+                    <span>MODO GLOBAL</span>
+                    <small>Missão Coop</small>
+                </div>
+            </label>
+        </div>
+
+        <button id="start-btn" onclick="entrarNoJogo()">INICIAR BUSCA</button>
     </div>
 
-    <div class="roulette-icon" onclick="toggleRoulette()">🎡</div>
-
-    <div id="roulette-modal">
-        <div class="close-roulette" onclick="toggleRoulette()">✖</div>
-        <div class="roulette-wrapper">
-            <div style="width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 35px solid var(--secondary-neon); position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 1001;"></div>
-            <div class="roulette-container" id="wheel">
-                <div style="width:40px; height:40px; background:var(--gold-neon); border-radius:50%; z-index:1002; border:4px solid #111;"></div>
+    <div id="map-screen">
+        <div class="map-ui">
+            <div class="stats-header">
+                <div class="life-counter" id="display-lives">❤️❤️❤️</div>
+                <div class="badge" id="mode-badge">MULTIPLAYER</div>
+                <button onclick="location.reload()" style="background:red; color:white; border:none; padding:4px 10px; border-radius:4px; font-size: 0.7rem;">SAIR</button>
             </div>
+            <div id="game-msg">Aguardando GPS...</div>
         </div>
-        <div class="result-name" id="winner-display"></div>
-        <div style="width: 85%; max-width: 320px; text-align: center;">
-            <div id="player-tags" style="max-height: 80px; overflow-y: auto; margin-bottom: 10px;"></div>
-            <div class="input-group">
-                <input type="text" id="player-name" placeholder="Nome do jogador...">
-                <button class="add-btn" onclick="addPlayer()">ADD</button>
-            </div>
-            <button class="add-btn" style="width:100%; margin-top:15px; height:50px; background:var(--primary-neon);" onclick="spinWheel()">GIRAR AGORA!</button>
-        </div>
+        <div id="map-area"></div>
     </div>
 
-    <header>
-        <h1>REVELA OU PAGA</h1>
-        <div class="creator-tag">Criador: Leonardo Silva</div>
-        <small id="mode-info" style="color:var(--primary-neon); font-weight: bold;">MODO: AMIGOS</small>
-    </header>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmKa73fkJYK-QeDFazZDFwFFzwoyH5Koo",
+            authDomain: "zombie-regional.firebaseapp.com",
+            databaseURL: "https://zombie-regional-default-rtdb.firebaseio.com",
+            projectId: "zombie-regional",
+            storageBucket: "zombie-regional.firebasestorage.app",
+            messagingSenderId: "158751505883",
+            appId: "1:158751505883:web:5b1d44f5f6b153d3063bfe"
+        };
 
-    <div class="categories">
-        <button class="cat-btn active" id="btn-Amigos" onclick="setCategory('Amigos')">Amigos</button>
-        <button class="cat-btn" id="btn-Pesado" onclick="setCategory('Pesado')">Pesado 🔥</button>
-        <button class="cat-btn" id="btn-Família" onclick="setCategory('Família')">Família</button>
-    </div>
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        var idUser = "user_" + Math.floor(Math.random() * 999999);
+        var mapa, meuMarcador, vidas = 3, modoEscolhido;
+        var marcadoresOutros = {}, marcadoresZumbis = {}, marcadoresItens = {}, pontoEscapeObj = null;
 
-    <div class="scene" id="card-scene">
-        <div class="card" id="card" onclick="flipCard()">
-            <div class="card-face card-front"></div>
-            <div class="card-face card-back">
-                <div class="type-label" id="card-type">REVELA</div>
-                <div class="content-text" id="card-text">Escolha um botão abaixo!</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="controls">
-        <button class="btn-action verdade" onclick="pick('verdade')">REVELA</button>
-        <button class="btn-action desafio" onclick="pick('desafio')">PAGA</button>
-    </div>
-
-    <div class="custom-area">
-        <div class="input-group">
-            <input type="text" id="custom-text" placeholder="Add segredo ou castigo...">
-            <button class="add-btn" onclick="addCustom()">ADD</button>
-        </div>
-    </div>
-
-<script>
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let musicActive = false;
-
-    function tone(freq, type, dur, vol, slide = 0) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        if (slide > 0) osc.frequency.exponentialRampToValueAtTime(slide, audioCtx.currentTime + dur);
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + dur);
-    }
-
-    function playGameMusic() {
-        if (musicActive) return;
-        musicActive = true;
-        const notes = [329.63, 392.00, 440.00, 523.25];
-        let i = 0;
-        setInterval(() => {
-            tone(notes[i], 'sine', 1, 0.02);
-            if (i % 2 === 0) tone(notes[i] * 2, 'triangle', 0.2, 0.01);
-            i = (i + 1) % notes.length;
-        }, 600);
-    }
-
-    const gameSFX = {
-        tap: () => tone(800, 'sine', 0.1, 0.06, 1200),
-        card: () => { 
-            tone(400, 'triangle', 0.15, 0.1); 
-            setTimeout(() => tone(900, 'sine', 0.1, 0.05), 40);
-        },
-        swipe: () => tone(200, 'sawtooth', 0.2, 0.04, 800),
-        roulette: () => {
+        // LIMPEZA AUTOMÁTICA DE "FANTASMAS" E ATUALIZAÇÃO DE VAGAS
+        db.ref('jogadores').on('value', snap => {
             let count = 0;
-            const timer = setInterval(() => {
-                tone(300 + (count * 20), 'square', 0.05, 0.02);
-                if (++count > 30) clearInterval(timer);
-            }, 100);
-        },
-        win: () => {
-            [523, 659, 783, 1046].forEach((f, i) => {
-                setTimeout(() => tone(f, 'sine', 0.5, 0.08), i * 120);
+            snap.forEach(() => count++);
+            const vagas = 3 - count;
+            document.getElementById('vagas-texto').innerText = vagas <= 0 ? "LOTADO" : "Vagas: " + vagas;
+            // Se as vagas bugarem (menos que zero), o admin pode resetar o banco
+        });
+
+        function entrarNoJogo() {
+            const nome = document.getElementById('user-name').value;
+            const cidade = document.getElementById('city-input').value;
+            modoEscolhido = document.querySelector('input[name="game-mode"]:checked').value;
+
+            if (!nome || !cidade) return alert("Preencha os campos!");
+            
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('map-screen').style.display = 'block';
+            document.getElementById('mode-badge').innerText = modoEscolhido.toUpperCase();
+
+            iniciarJogo(nome, cidade);
+        }
+
+        function iniciarJogo(nome, cidade) {
+            navigator.geolocation.watchPosition((pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+
+                const path = modoEscolhido === 'multi' ? 'jogadores/' : 'global/players/';
+                const userRef = db.ref(path + idUser);
+
+                // A MÁGICA: onDisconnect apaga seus dados se a conexão cair!
+                userRef.onDisconnect().remove();
+                userRef.set({ nome, lat, lng, vidas, timestamp: Date.now() });
+
+                if (!mapa) {
+                    mapa = L.map('map-area', { zoomControl: false }).setView([lat, lng], 17);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapa);
+                    meuMarcador = L.circleMarker([lat, lng], { radius: 10, fillColor: "#00ff88", color: "#fff", fillOpacity: 1 }).addTo(mapa);
+                    
+                    if(modoEscolhido === 'global') {
+                        db.ref('global/missao').once('value', snap => {
+                            if (!snap.exists()) gerarMundoGlobal(lat, lng);
+                        });
+                        ouvirGlobal();
+                    } else {
+                        document.getElementById('game-msg').innerText = "Modo Livre Ativado";
+                        ouvirMultiplayer();
+                    }
+                } else {
+                    meuMarcador.setLatLng([lat, lng]);
+                    if(modoEscolhido === 'global') verificarColisaoGlobal(lat, lng);
+                }
+            }, null, { enableHighAccuracy: true });
+        }
+
+        function gerarMundoGlobal(lat, lng) {
+            let itens = {};
+            for(let i=0; i<3; i++) {
+                itens['item_'+i] = { lat: lat + (Math.random()-0.5)*0.008, lng: lng + (Math.random()-0.5)*0.008 };
+            }
+            let zumbis = {};
+            for(let i=0; i<12; i++) {
+                zumbis['z_'+i] = { lat: lat + (Math.random()-0.5)*0.01, lng: lng + (Math.random()-0.5)*0.01 };
+            }
+            db.ref('global/missao').set({ itens, zumbis, moedasColetadas: 0 });
+            // Limpa a missão se o último jogador sair
+            db.ref('global/missao').onDisconnect().remove();
+        }
+
+        function ouvirMultiplayer() {
+            db.ref('jogadores').on('value', snap => {
+                const data = snap.val();
+                // Limpa marcadores antigos para não duplicar
+                for(let id in marcadoresOutros) mapa.removeLayer(marcadoresOutros[id]);
+                marcadoresOutros = {};
+
+                for(let id in data) {
+                    if(id !== idUser) {
+                        marcadoresOutros[id] = L.circleMarker([data[id].lat, data[id].lng], {radius: 8, fillColor: "red"}).addTo(mapa);
+                        marcadoresOutros[id].bindTooltip(data[id].nome);
+                    }
+                }
             });
         }
-    };
 
-    let players = [];
-    let isSpinning = false;
-    
-    function toggleRoulette() {
-        gameSFX.tap();
-        const modal = document.getElementById('roulette-modal');
-        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-    }
+        function ouvirGlobal() {
+            db.ref('global/missao').on('value', snap => {
+                const data = snap.val();
+                if(!data) return;
+                document.getElementById('game-msg').innerText = `MOEDAS: ${data.moedasColetadas}/3`;
 
-    function addPlayer() {
-        gameSFX.tap();
-        const input = document.getElementById('player-name');
-        if (input.value.trim() !== "") {
-            players.push(input.value.trim());
-            renderPlayers();
-            input.value = "";
+                for(let id in marcadoresItens) mapa.removeLayer(marcadoresItens[id]);
+                marcadoresItens = {};
+                for(let id in data.itens) marcadoresItens[id] = L.circleMarker([data.itens[id].lat, data.itens[id].lng], {radius: 7, fillColor: "gold"}).addTo(mapa);
+
+                for(let id in marcadoresZumbis) mapa.removeLayer(marcadoresZumbis[id]);
+                marcadoresZumbis = {};
+                for(let id in data.zumbis) marcadoresZumbis[id] = L.circleMarker([data.zumbis[id].lat, data.zumbis[id].lng], {radius: 9, fillColor: "red"}).addTo(mapa);
+            });
         }
-    }
 
-    function renderPlayers() {
-        document.getElementById('player-tags').innerHTML = players.map(p => `<span class="player-tag">${p}</span>`).join('');
-    }
-
-    function spinWheel() {
-        if (players.length < 2 || isSpinning) return;
-        isSpinning = true;
-        gameSFX.roulette();
-        const wheel = document.getElementById('wheel');
-        const display = document.getElementById('winner-display');
-        display.innerText = "SORTEANDO...";
-        display.classList.remove('win-anim');
-        const deg = Math.floor(Math.random() * 360) + 5000; 
-        wheel.style.transform = `rotate(${deg}deg)`;
-        setTimeout(() => {
-            gameSFX.win();
-            display.innerText = players[Math.floor(Math.random() * players.length)];
-            display.classList.add('win-anim');
-            isSpinning = false;
-        }, 5000);
-    }
-
-    const card = document.getElementById('card');
-    const scene = document.getElementById('card-scene');
-    const cardText = document.getElementById('card-text');
-    const cardType = document.getElementById('card-type');
-    let currentCategory = 'Amigos';
-    let usedQuestions = [];
-
-    const db = {
-        'Amigos': {
-            verdade: [
-                "Qual seu crush secreto hoje?", "Já mentiu para alguém nesta roda?", "Beijaria alguém aqui por 100 reais?", "Pior mico que passou?", "Ilha deserta com quem?", "Quem aqui é a pessoa mais chata?", "Qual foi a última mentira que você contou?", "Já pegou algum ex de amigo?", "Qual seu hábito mais estranho?", "Se pudesse trocar de vida com alguém aqui, quem seria?", "Qual seu maior medo no amor?", "O que você achou da primeira pessoa que conheceu aqui?", "Já fingiu estar doente para não sair?", "Qual a coisa mais infantil que você ainda faz?", "Quem aqui você nunca deixaria cuidar dos seus filhos?", "Já stalkeou alguém hoje?", "O que você faria se ganhasse na loteria agora?", "Qual sua maior insegurança?", "Já chorou por causa de um filme de desenho?",
-                /* +20 Novas Perguntas Curiosas */
-                "Qual a coisa mais cara que você já comprou e se arrependeu?", "Qual o sonho mais estranho que você já teve?", "Você acredita em ETs?", "Qual sua mania mais irritante?", "Já mandou mensagem pro grupo errado?", "Qual sua rede social favorita?", "Se você fosse um animal, qual seria?", "Já pesquisou seu próprio nome no Google?", "Qual música você tem vergonha de gostar?", "Qual a sua maior conquista até hoje?", "Você prefere viajar pro futuro ou pro passado?", "Qual o seu maior talento oculto?", "Já teve uma experiência paranormal?", "Qual a primeira coisa que você olha em alguém?", "Você se considera uma pessoa ciumenta?", "O que você faria se fosse invisível por um dia?", "Qual sua comida favorita que ninguém mais gosta?", "Já deu um 'gelo' em alguém por motivo bobo?", "Qual foi o último app que você baixou?", "Qual a coisa mais corajosa que já fez?"
-            ],
-            desafio: [
-                "Imite um macaco por 30 segundos.", "Mande um emoji de coração pro seu crush.", "Tente lamber seu cotovelo.", "Dança ridícula sem música.", "Fale com sotaque de outro estado até sua próxima vez.", "Deixe alguém postar um 'Oi' no seu Instagram.", "Ligue para um contato aleatório e cante 'Parabéns'.", "Faça 15 flexões ou pague um lanche pro dono do celular.", "Fique 1 rodada sem falar nada.", "Imite alguém da roda até descobrirem quem é.", "Tente equilibrar uma colher no nariz por 1 minuto.", "Mande uma mensagem para sua mãe dizendo que vai casar amanhã.", "Faça uma pose de modelo e fique assim por 30 segundos.", "Deixe alguém da roda ver sua última foto na galeria.", "Tome um copo de água sem usar as mãos.",
-                /* +20 Novos Desafios Engraçados */
-                "Fale rimando por 2 rodadas.", "Deixe alguém bagunçar seu cabelo e fique assim.", "Faça uma mímica de um filme e alguém tem que acertar.", "Tente não rir enquanto alguém te faz cócegas por 10 segundos.", "Desenhe um bigode em você mesmo (com caneta que sai).", "Beba um copo de água com sal (só um pouquinho!).", "Poste uma foto de infância vergonhosa nos stories.", "Fale como um robô por 1 minuto.", "Tente tocar os dedos dos pés sem dobrar o joelho.", "Mande um áudio para o quinto contato do WhatsApp dizendo 'Te amo'.", "Use as meias nas mãos até o fim do jogo.", "Finja que é um comentarista de futebol por 30 segundos.", "Dance 'Baby Shark' com toda a energia.", "Tente fazer um malabarismo com 3 objetos e falhe miseravelmente.", "Peça desculpas para uma parede por 20 segundos.", "Deixe alguém escrever algo no seu braço.", "Faça um freestyle de rap sobre a pessoa à sua esquerda.", "Equilibre o celular na cabeça por 30 segundos enquanto caminha.", "Imite um despertador até alguém te 'desligar'.", "Conte uma piada e se ninguém rir, pague 10 polichinelos."
-            ]
-        },
-        'Pesado': {
-            verdade: [
-                "Qual sua maior fantasia?", "Já beijou alguém nesta roda?", "Mandou nudes recentemente?", "Já teve sonho erótico com alguém daqui?", "Qual seu ponto mais sensível?", "Luz acesa ou apagada na hora H?", "Já transou no carro?", "Qual sua posição favorita?", "Sente no colo por 1 rodada.", "Qual foi o lugar mais estranho que você já ficou com alguém?", "Já foi pego no flagra?", "Prefere dominar ou ser dominado?", "Qual o nome da pessoa que você mais se arrepende de ter ficado?", "Já usou algum brinquedo?", "Quem aqui você teria coragem de ter uma amizade colorida?", "Tamanho realmente importa para você?", "Já beijou alguém do mesmo sexo?", "Qual sua maior loucura na cama?",
-                /* +20 Perguntas Estranhas/Curiosas */
-                "Qual a coisa mais nojenta que você já fez sozinho?", "Qual seu pensamento mais estranho sobre alguém aqui?", "Já sentiu atração por um parente distante?", "Qual o cheiro mais estranho que você gosta?", "Já fingiu prazer para não magoar alguém?", "Qual a coisa mais bizarra que você já viu na internet?", "Já teve vontade de beijar um desconhecido no ônibus?", "Qual seu maior fetiche que ninguém sabe?", "Já usou a escova de dentes de outra pessoa?", "Qual o lugar mais sujo que você já frequentou?", "Você tem algum hábito higiênico duvidoso?", "Já falou sozinho no espelho fingindo ser outra pessoa?", "Qual foi a última vez que você chorou e por quê?", "Qual a parte do corpo das pessoas que você mais repara?", "Já teve um crush em algum personagem de desenho animado?", "Qual o segredo mais obscuro que você já descobriu de alguém?", "Você prefere ficar sem banho por uma semana ou sem internet?", "Qual o seu maior arrependimento 'debaixo dos lençóis'?", "Já mentiu o nome em uma balada?", "Qual a coisa mais estranha que você já comeu?",
-                /* +20 Perguntas/Desafios Suspeitos */
-                "Mostre o histórico do seu navegador agora.", "Qual a mensagem mais 'quente' que você recebeu hoje?", "Deixe alguém ler seus pedidos no iFood ou compras recentes.", "Quem nesta roda você levaria para um motel?", "Já fez algo ilegal e nunca foi pego?", "Dê o seu celular desbloqueado para a pessoa à sua frente por 1 minuto.", "Quem você deletaria da vida agora mesmo?", "Já traiu ou foi traído?", "Mande um 'Oi sumido(a)' para seu/sua ex.", "Qual a maior mentira que você já contou para seus pais?", "Já usou o celular de alguém escondido?", "Desafio: Mande um nude (ou simule um) para os seus rascunhos e mostre.", "Fique de mãos dadas com a pessoa à direita até a próxima rodada.", "Sente no chão e deixe alguém usar você como cadeira.", "Cheire o pé de alguém da roda.", "Mande uma mensagem para o seu chefe/professor dizendo 'Eu sei o que você fez'.", "Revele quanto dinheiro você tem na conta bancária.", "Tire os sapatos e as meias e deixe alguém tirar uma foto.", "Qual a coisa mais 'suspeita' que você já pesquisou no Google?", "Deixe alguém da roda enviar um SMS para qualquer contato seu."
-            ],
-            desafio: [
-                "Beijo no pescoço da pessoa à sua esquerda.", "Mande uma mensagem ousada pro último match do Tinder.", "Tire uma peça de roupa.", "Lamba o pescoço da pessoa à frente.", "Sussurre algo picante no ouvido de alguém.", "Faça uma massagem nos pés de quem está à sua direita.", "Fique apenas de roupa íntima (ou pague 5 doses/micos).", "Deixe alguém da roda morder seu lábio levemente.", "Tente tirar a camiseta de alguém usando apenas os dentes.", "Faça um 'lap dance' de 20 segundos em alguém da roda.", "Mande um áudio gemendo para um amigo próximo.", "Deixe alguém da roda cheirar seu pescoço.", "Coma uma fruta de forma sensual olhando para alguém."
-            ]
-        },
-        'Família': {
-            verdade: [
-                "Quem é o filho favorito?", "Qual segredo você esconde dos seus pais?", "Lembrança de infância mais engraçada?", "Já culpou seu irmão por um erro seu?", "Qual a maior bronca que você já levou?", "Quem da família é o mais preguiçoso?", "O que você faria com o dinheiro da herança?", "Já quebrou algo e escondeu?", "Qual parente você não suporta em festas?", "Quem aqui cozinha melhor?", "Qual apelido de infância você odeia?", "Já fingiu gostar de um presente de Natal?",
-                /* +20 Perguntas de Família */
-                "Qual a maior loucura que seus pais já fizeram?", "Você já fugiu de casa?", "Qual a regra da casa que você mais odeia?", "Quem é o parente mais fofoqueiro?", "Qual a história de família que todo mundo conta em churrasco?", "Já pegou dinheiro escondido da carteira dos pais?", "Qual a maior mentira que você já contou para evitar um castigo?", "Quem da família você levaria para uma viagem espacial?", "Qual prato da sua mãe/vó é insuperável?", "Você prefere o Natal ou o Ano Novo em família?", "Qual a coisa mais embaraçosa que seus pais já fizeram na frente dos seus amigos?", "Já fingiu que estava dormindo para não ajudar a limpar a casa?", "Qual o maior mico que você passou em um evento de família?", "Quem da família você acha que seria o primeiro a morrer em um apocalipse zumbi?", "Qual a mania mais irritante do seu irmão/irmã?", "Você se vê morando perto da sua família no futuro?", "Qual o melhor conselho que você já recebeu de um parente?", "Já usou a roupa de alguém da família sem pedir?", "Quem é o 'queridinho' dos avós?", "Qual a maior tradição da sua família?"
-            ],
-            desafio: [
-                "Lave a louça da próxima refeição.", "Conte uma piada ruim e faça todos rirem.", "Mímica de um animal difícil.", "Imite seu pai ou sua mãe agora.", "Ligue para um parente e diga que o ama do nada.", "Faça um café para quem está jogando.", "Dance uma música antiga da Xuxa.", "Arume uma gaveta da casa agora.", "Fique 2 minutos sem usar o celular.", "Faça uma declaração de amor para um pet da casa.",
-                /* +20 Desafios de Família */
-                "Organize os sapatos da sala.", "Dê um abraço de 30 segundos em quem está jogando com você.", "Faça uma massagem nos ombros de quem está à sua esquerda.", "Cante o hino nacional com uma voz engraçada.", "Vá até a cozinha e traga um copo de água para o 'rei' da rodada.", "Fique em silêncio absoluto por 3 rodadas.", "Faça 10 agachamentos gritando 'Eu amo minha família'.", "Deixe alguém da família mudar sua foto de perfil do WhatsApp por 10 minutos.", "Mande uma mensagem no grupo da família dizendo que ganhou na loteria.", "Tente equilibrar um livro na cabeça enquanto dá uma volta na sala.", "Imite um bebê chorando por 20 segundos.", "Faça uma careta e deixe alguém tirar uma foto.", "Diga algo que você admira em cada pessoa da roda.", "Ligue para um primo e conte uma fofoca falsa.", "Tente assobiar uma música famosa e alguém tem que adivinhar.", "Use o chinelo trocado até o final do jogo.", "Finja que é um garçom e sirva petiscos para todos.", "Faça uma rima com o nome de cada pessoa presente.", "Limpe a tela do celular de todo mundo que está jogando.", "Tente fazer um castelo de cartas com 5 cartas."
-            ]
+        function verificarColisaoGlobal(lat, lng) {
+            for(let id in marcadoresItens) {
+                if(mapa.distance([lat, lng], marcadoresItens[id].getLatLng()) < 20) {
+                    db.ref('global/missao/itens/' + id).remove();
+                    db.ref('global/missao/moedasColetadas').transaction(c => (c || 0) + 1);
+                }
+            }
+            for(let id in marcadoresZumbis) {
+                if(mapa.distance([lat, lng], marcadoresZumbis[id].getLatLng()) < 15) {
+                    vidas--;
+                    db.ref('global/missao/zumbis/' + id).remove();
+                    document.getElementById('display-lives').innerText = "❤️".repeat(vidas) || "💀";
+                    if(vidas <= 0) { alert("VOCÊ MORREU!"); location.reload(); }
+                }
+            }
         }
-    };
 
-    function setCategory(cat) {
-        if(currentCategory === cat) return;
-        gameSFX.swipe();
-        currentCategory = cat;
-        usedQuestions = [];
-        scene.classList.remove('card-change-anim');
-        void scene.offsetWidth; 
-        scene.classList.add('card-change-anim');
-        document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('btn-' + cat).classList.add('active');
-        document.getElementById('mode-info').innerText = "MODO: " + cat.toUpperCase();
-        resetCard();
-    }
-
-    function pick(mode) {
-        gameSFX.card();
-        const list = db[currentCategory][mode === 'verdade' ? 'verdade' : 'desafio'];
-        let available = list.filter(q => !usedQuestions.includes(q));
-        if (available.length === 0) { usedQuestions = []; available = list; }
-        const randomText = available[Math.floor(Math.random() * available.length)];
-        usedQuestions.push(randomText);
-        
-        if(card.classList.contains('is-flipped')) {
-            card.classList.remove('is-flipped');
-            setTimeout(() => { updateAndFlip(mode, randomText); }, 300);
-        } else { updateAndFlip(mode, randomText); }
-    }
-
-    function updateAndFlip(mode, text) {
-        cardType.innerText = mode === 'verdade' ? 'REVELA' : 'PAGA';
-        cardType.style.color = mode === 'verdade' ? '#2196F3' : '#F44336';
-        cardText.innerText = text;
-        card.classList.add('is-flipped');
-    }
-
-    function flipCard() { 
-        if(cardText.innerText !== "Escolha um botão abaixo!") {
-            gameSFX.card();
-            card.classList.toggle('is-flipped'); 
-        }
-    }
-    
-    function resetCard() { card.classList.remove('is-flipped'); cardText.innerText = "Escolha um botão abaixo!"; }
-    
-    function addCustom() {
-        gameSFX.tap();
-        const input = document.getElementById('custom-text');
-        if(input.value.trim() !== "") db[currentCategory].desafio.push(input.value);
-        input.value = "";
-    }
-</script>
+        // Limpeza extra ao fechar normal
+        window.onbeforeunload = () => {
+            db.ref('jogadores/' + idUser).remove();
+            db.ref('global/players/' + idUser).remove();
+        };
+    </script>
 </body>
 </html>
